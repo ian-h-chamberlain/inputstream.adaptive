@@ -98,6 +98,7 @@ private:
 };
 
 class CdmAdapter : public std::enable_shared_from_this<CdmAdapter>,
+                   public cdm::Host_8,
                    public cdm::Host_10,
                    public cdm::Host_11,
                    public cdm::Host_12
@@ -244,6 +245,38 @@ class CdmAdapter : public std::enable_shared_from_this<CdmAdapter>,
 
   std::future<std::string> PrepareSessionFuture(uint32_t promiseId);
 
+  // cdm::Host_8 implementation.
+  inline void OnLegacySessionError(
+    const char* session_id,
+    uint32_t session_id_length,
+    cdm::Error error,
+    uint32_t system_code,
+    const char* error_message,
+    uint32_t error_message_length);
+
+  // Legacy Host_8 version
+  inline void OnRejectPromise(uint32_t promise_id,
+                     cdm::Error error,
+                     uint32_t system_code,
+                     const char* error_message,
+                     uint32_t error_message_size)
+  {
+    cdm::Exception ex = static_cast<cdm::Exception>(static_cast<int>(error));
+    OnRejectPromise(promise_id, ex, system_code, error_message, error_message_size);
+  }
+
+  // Legacy Host_8 version
+  inline void OnSessionMessage(const char* session_id,
+                      uint32_t session_id_size,
+                      cdm::MessageType message_type,
+                      const char* message,
+                      uint32_t message_size,
+                      const char* legacy_destination_url,
+                      uint32_t legacy_destination_url_length)
+  {
+    OnSessionMessage(session_id, session_id_size, message_type, message, message_size);
+  }
+
   //Misc
   ~CdmAdapter();
   bool LoadCDM();
@@ -296,6 +329,7 @@ private:
   std::future<void> m_initFuture;
   std::atomic<bool> m_provisioningCompleteOrStarted;
 
+  cdm::ContentDecryptionModule_8* cdm8_{nullptr};
   cdm::ContentDecryptionModule_10* cdm10_{nullptr};
   cdm::ContentDecryptionModule_11* cdm11_{nullptr};
   cdm::ContentDecryptionModule_12* cdm12_{nullptr};
