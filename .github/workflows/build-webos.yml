@@ -43,11 +43,14 @@ jobs:
         path: ${{ env.app_id }}
     - name: Configure
       run: |
-        cd ${app_id}
-        mkdir -p build && cd build
-        cmake -DADDONS_TO_BUILD=${app_id} -DADDON_SRC_PREFIX=../.. \
-              -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/xbmc/addons \
-              -DPACKAGE_ZIP=1 ${{ github.workspace }}/xbmc/cmake/addons
+        cd ${app_id} && mkdir -p build && cd build
+        cmake -DADDONS_TO_BUILD=${app_id} \
+              -DADDON_SRC_PREFIX=${{ github.workspace }} \
+              -DCMAKE_BUILD_TYPE=Debug \
+              -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/xbmc/addons \
+              -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/xbmc-deps/arm-webos-linux-gnueabi-release/share/Toolchain_binaddons.cmake \
+              -DPACKAGE_ZIP=1 \
+              -DPACKAGE_DIR=${{ github.workspace }}/build_zips ${{ github.workspace }}/xbmc/cmake/addons
     - name: Build
       run: |
         cd ${app_id}/build
