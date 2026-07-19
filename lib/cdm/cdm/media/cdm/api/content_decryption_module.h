@@ -33,8 +33,8 @@ typedef __int64 int64_t;
 
 // Build the versioned entrypoint name.
 // The extra macros are necessary to expand version to an actual value.
-#define INITIALIZE_CDM_MODULE \
-  BUILD_ENTRYPOINT(InitializeCdmModule, CDM_MODULE_VERSION)
+#define INITIALIZE_CDM_MODULE InitializeCdmModule // \
+//   BUILD_ENTRYPOINT(, CDM_MODULE_VERSION)
 #define BUILD_ENTRYPOINT(name, version) \
   BUILD_ENTRYPOINT_NO_EXPANSION(name, version)
 #define BUILD_ENTRYPOINT_NO_EXPANSION(name, version) name##_##version

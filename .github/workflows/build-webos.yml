@@ -1,5 +1,5 @@
 name: Build for webOS
-on: [push, pull_request]
+on: [push, pull_request, workflow_dispatch]
 env:
   app_id: inputstream.adaptive
 
@@ -45,23 +45,26 @@ jobs:
       run: |
         cd ${app_id}
         mkdir -p build && cd build
+        source /tmp/arm-webos-linux-gnueabi_sdk-buildroot/environment-setup
         cmake -DADDONS_TO_BUILD=${app_id} -DADDON_SRC_PREFIX=../.. \
               -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/xbmc/addons \
               -DPACKAGE_ZIP=1 ${{ github.workspace }}/xbmc/cmake/addons
     - name: Build
       run: |
         cd ${app_id}/build
+        source /tmp/arm-webos-linux-gnueabi_sdk-buildroot/environment-setup
         make
-    - name: Run tests
-      run: |
-        cd ${app_id}/build/${app_id}-prefix/src/${app_id}-build
-        make CTEST_OUTPUT_ON_FAILURE=1 GTEST_COLOR=1 test
+    # - name: Run tests
+    #   run: |
+    #     cd ${app_id}/build/${app_id}-prefix/src/${app_id}-build
+    #     make CTEST_OUTPUT_ON_FAILURE=1 GTEST_COLOR=1 test
     - name: Make ZIP artifact
       run: |
         cd ${{ github.workspace }}/xbmc/addons
-        zip -r inputstream.adaptive.zip inputstream.adaptive
+        zip -y -r ${{ env.app_id }}_${{ matrix.ZIP_NAME_SUFFIX }}.zip inputstream.adaptive
     - name: Upload zipped artifact
       uses: actions/upload-artifact@v7
       with:
-        name: ${{ env.app_id }}_${{ matrix.ZIP_NAME_SUFFIX }}.zip
-        path: ${{ github.workspace }}/xbmc/addons/inputstream.adaptive.zip
+        # https://github.com/actions/upload-artifact/issues/785
+        path: ${{ github.workspace }}/xbmc/addons/${{ env.app_id }}_${{ matrix.ZIP_NAME_SUFFIX }}.zip
+        archive: false

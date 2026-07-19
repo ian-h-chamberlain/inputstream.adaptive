@@ -24,9 +24,6 @@ if(CORE_SYSTEM_NAME STREQUAL android)
   find_package(LibAndroidJNI REQUIRED)
 endif()
 
-if(CMAKE_CXX_COMPILER MATCHES "arm-webos")
-  add_compile_definitions(TARGET_WEBOS=1)
-endif()
 
 if(WIN32)
   if(MSVC)
@@ -105,6 +102,10 @@ foreach(DEP_NAME ${DEPS_NAMES_LIST})
 endforeach()
 
 build_addon(inputstream.adaptive ADP DEPLIBS)
+
+if(CMAKE_CXX_COMPILER MATCHES "arm-webos")
+  add_compile_definitions(TARGET_WEBOS=1)
+endif()
 
 if(NOT CMAKE_CROSSCOMPILING AND BUILD_TESTING)
   list(APPEND CMAKE_CTEST_ARGUMENTS "-V")
